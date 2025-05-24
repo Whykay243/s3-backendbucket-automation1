@@ -45,7 +45,7 @@ jobs:
 
       - name: Check and import existing DynamoDB table if present
         run: |
-          if aws dynamodb describe-table --table-name terraform-locks; then
+          if aws dynamodb describe-table --table-name terraform-locks >/dev/null 2>&1; then
             echo "DynamoDB table terraform-locks exists. Importing into Terraform state."
             terraform import aws_dynamodb_table.terraform_locks terraform-locks
           else
