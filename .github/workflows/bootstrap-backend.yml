@@ -56,6 +56,13 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}
 
+      - name: Debug backend.tfvars presence
+        run: |
+          echo "Files in working directory:"
+          ls -la
+          echo "Contents of backend.tfvars:"
+          cat backend.tfvars
+
       - name: Terraform Plan
         run: terraform plan -var-file="backend.tfvars"
 
