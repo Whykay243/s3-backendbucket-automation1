@@ -43,6 +43,19 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
+      - name: Check and import existing DynamoDB table if present
+        run: |
+          if aws dynamodb describe-table --table-name terraform-locks; then
+            echo "DynamoDB table terraform-locks exists. Importing into Terraform state."
+            terraform import aws_dynamodb_table.terraform_locks terraform-locks
+          else
+            echo "DynamoDB table terraform-locks does not exist. Terraform will create it."
+          fi
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}
+
       - name: Terraform Plan
         run: terraform plan -var-file="backend.tfvars"
 
