@@ -47,7 +47,7 @@ jobs:
         run: |
           if aws dynamodb describe-table --table-name terraform-locks >/dev/null 2>&1; then
             echo "DynamoDB table terraform-locks exists. Importing into Terraform state."
-            terraform import aws_dynamodb_table.terraform_locks terraform-locks
+            terraform import -var-file="backend.tfvars" aws_dynamodb_table.terraform_locks terraform-locks
           else
             echo "DynamoDB table terraform-locks does not exist. Terraform will create it."
           fi
