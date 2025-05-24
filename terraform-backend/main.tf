@@ -1,21 +1,5 @@
-provider "aws" {
-  region = var.region
-}
-
 resource "aws_s3_bucket" "terraform_state" {
   bucket = var.bucket_name
-
-  versioning {
-    enabled = true
-  }
-
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
-    }
-  }
 
   lifecycle {
     prevent_destroy = true
@@ -24,15 +8,20 @@ resource "aws_s3_bucket" "terraform_state" {
   tags = var.tags
 }
 
-resource "aws_dynamodb_table" "terraform_locks" {
-  name         = var.dynamodb_table
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "LockID"
+resource "aws_s3_bucket_versioning" "terraform_state_versioning" {
+  bucket = aws_s3_bucket.terraform_state.id
 
-  attribute {
-    name = "LockID"
-    type = "S"
+  versioning_configuration {
+    status = "Enabled"
   }
+}
 
-  tags = var.tags
+resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state_encryption" {
+  bucket = aws_s3_bucket.terraform_state.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
 }
